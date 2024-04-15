@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QFileDialog, QMessageBox, QSpacerItem, QSizePolicy,QFrame
 from PyQt6.QtCore import pyqtSignal, QThread, QSize
 from PyQt6.QtGui import QFont
+from openai import OpenAI
 import pandas as pd
 import os
 import openai
@@ -12,11 +13,7 @@ import time
 import textwrap
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-api_key = os.getenv('OPENAI_API_KEY')
-if api_key is None:
-    raise ValueError("OPENAI_API_KEY is not set in the environment variables.")
-else:
-    print("API Key found")
+
 
 class CustomDialog(QDialog):
     def __init__(self):
@@ -27,7 +24,7 @@ class CustomDialog(QDialog):
         self.modelUsed = None
         self.modelInstruction = None
         self.promptEnding = None
-        self.openaiApikey = None
+    #    self.openaiApikey = None
         self.filePath = None
         self.outputFilePath = None
         self.inputFilePromptColHeading = None
@@ -84,12 +81,6 @@ class CustomDialog(QDialog):
         self.modelUsedCombo = QComboBox()
         self.modelUsedCombo.addItems(['gpt-4','gpt-4-turbo','gpt-3.5-turbo', ])
         modelSelectionLayout.addWidget(self.modelUsedCombo)
-
-        openaiApiLabel = QLabel("What is your OpenAI API Key?")
-        openaiApiLabel.setFont(bold_font)
-        generalInfoLayout.addWidget(openaiApiLabel)
-        self.openaiApiEntry = QLineEdit(api_key)
-        generalInfoLayout.addWidget(self.openaiApiEntry)
 
         # Insert horizontal line separator before input configuration
         line = QFrame()
@@ -205,7 +196,7 @@ class CustomDialog(QDialog):
         self.modelUsed = self.modelUsedCombo.currentText()
         self.modelInstruction = self.modelInstructionEntry.toPlainText()
         self.promptEnding = self.promptEndingEntry.toPlainText()
-        self.openaiApikey = self.openaiApiEntry.text()
+    #    self.openaiApikey = self.openaiApiEntry.text()
         self.filePath = self.filePathLabel.text()  # Assuming filePathLabel displays the selected file path
         self.outputFilePath = self.outputFilePathLabel.text()  # Assuming outputFilePathLabel displays the selected output file path
         self.inputFilePromptColHeading = self.inputFilePromptColHeadingEntry.text()
@@ -213,132 +204,114 @@ class CustomDialog(QDialog):
         self.dynamicHeaders = [x.strip() for x in self.outputColumnNames.split(',') if x.strip()]
         self.accept()  # Use QDialog's accept method to close the dialog properly
 
+# Create an OpenAI client instance
+api_key = os.getenv('OPENAI_API_KEY')
+if api_key is None:
+    raise ValueError("OPENAI_API_KEY is not set in the environment variables")
+else:
+    client = OpenAI(api_key=api_key)
+    print("API Key found and client instantiated")
+
+""" client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+) """
+
 def main():
     app = QApplication(sys.argv)
     dialog = CustomDialog()
     if dialog.exec() == QDialog.DialogCode.Accepted:
-        # Extract the file path once and use it locally
         filePath = dialog.filePath
         modelRole = dialog.modelRole
         modelUsed = dialog.modelUsed
-        modelInstruction = dialog.modelInstruction +dialog.promptEnding
+        modelInstruction = dialog.modelInstruction + dialog.promptEnding
         outputFilePath = dialog.outputFilePath
         inputFilePromptColHeading = dialog.inputFilePromptColHeading
         dynamicHeaders = dialog.dynamicHeaders
 
-    #Set the API key
-        openai.api_key = dialog.openaiApikey
-
         print(f"Model Role: {modelRole}")
         print(f"Model Used: {modelUsed}")
-        print(f"OpenAIAPI: {dialog.openaiApikey}")
         print(f"File Path: {filePath}")
         print(f"Output File Path: {outputFilePath}")
         print(f"Input Column Heading: {inputFilePromptColHeading}")
         print(f"Output Column Names: {dynamicHeaders}")
         print(f"Instruction: {modelInstruction}")
 
-    # Determine the file extension
     try:
         file_extension = filePath.split('.')[-1]
-
-        # Load the file accordingly
         if file_extension.lower() == 'csv':
             df = pd.read_csv(filePath)
         elif file_extension.lower() in ['xls', 'xlsx']:
             df = pd.read_excel(filePath)
         else:
-            raise ValueError(f'Only upload EXCEL or CSV files. Unsupported file extension: {file_extension}')
+            raise ValueError(f'Unsupported file extension: {file_extension}')
     except ValueError as e:
         messagebox.showerror("File Type Error", str(e))
 
-    # Configure logging (writes to the terminal when there is a retry on the get_chatgpt_response function)
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    # a function that logs a message whenever a retry is about to happen
     def log_retry(attempt):
         logger.info(f"Retrying... Attempt {attempt.retry_state.attempt_number}")
 
-    # Updated function to get a response from gpt
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1)) # Retry the prompt 3 times if there is a problem with a 1 second wait
-
-    # ChatGPT Call function, passing in text
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
     def get_chatgpt_response(text):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=modelUsed,
             messages=[
                 {"role": "system", "content": modelRole},
                 {"role": "user", "content": modelInstruction},
                 {"role": "user", "content": text}
             ],
-        temperature=0.1, #A higher temperature (e.g., 0.7) results in more diverse and creative output, while a lower temperature (e.g., 0.2) makes the output more deterministic and focused.
-        #stop=["\n"],
-        timeout=10  # sets a 10-second timeout for the request
+            temperature=0.1,
+            timeout=10
         )
+        
+     #   usage_info = response.get('usage', {})
+     #   logging.info(f"ChatGPT usage: {usage_info}")
+        return response.choices[0].message.content.strip()
 
-    # extract the usage part of the loggin info
-        usage_info = response.get('usage', {})
-        logging.info(f"ChatGPT usage: {usage_info}")
-        # alternative here for all data is logging.info(f'ChatGPT response: {response}')
-        return response['choices'][0]['message']['content'].strip() 
+    df.iloc[0:0].to_csv(outputFilePath, index=False)
 
-    # Write the header to the output CSV file
-    df.iloc[0:0].to_csv(outputFilePath, index=False)  # Write an empty DataFrame with the same columns to create the CSV with headers
-
-    # Function to split resulting table into rows and columns
     def parse_table(table_text):
-        # Split the text into lines
         lines = table_text.strip().split('\n')
-
-        # Check if the first and last lines are borders (optional based on your data structure)
         if lines[0].strip('-|+ \n') == '':
-            lines = lines[1:]  # Remove the first line if it's a border
+            lines = lines[1:]
         if lines[-1].strip('-|+ \n') == '':
-            lines = lines[:-1]  # Remove the last line if it's a border
+            lines = lines[:-1]
 
-        # Initialize an empty list to hold the cleaned table data
         table_data = []
         for row in lines:
-            # Check if the row is a dash separator line
             if row.strip('-|+ \n') == '':
-                continue  # Skip this row if it's a separator line
-
-            # Split the row into columns and strip whitespace
+                continue
             columns = re.split(r'\|', row)[1:-1]
             cleaned_columns = [col.strip() for col in columns]
             table_data.append(cleaned_columns)
-
         return table_data
 
-    #write headers to columns in output file
     headers = list(df.columns) + dynamicHeaders
     with open(outputFilePath, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(headers)
 
-    # Process each row, update the data columns, and append to the CSV file
     for index, row in df.iterrows():
-        print(f"Now processing row {index+2}")  # Prints the current row being processed
+        print(f"Now processing row {index+2}")
         try:
             table_text = get_chatgpt_response(row[inputFilePromptColHeading])
             table_data = parse_table(table_text)
-            # Append the parsed rows to the CSV file
             with open(outputFilePath, mode='a', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 for table_row in table_data:
-                    # Include the input data for the first row
                     output_row = list(row) + table_row
                     writer.writerow(output_row)
         except Exception as e:
             print(f"Error at index {index}: {e}")
-            logging.error(f'Error at index {index}: {e}')  # Logging the error
-            # Append an error row to the CSV file
+            logging.error(f'Error at index {index}: {e}')
             with open(outputFilePath, mode='a', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 error_row = list(row) + ['Error', f'Error at index {index}: {e}']
                 writer.writerow(error_row)
-                time.sleep(1)
+                time.sleep(1) 
 
 if __name__ == "__main__":
     main()
