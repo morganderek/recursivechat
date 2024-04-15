@@ -14,7 +14,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 
 api_key = os.getenv('OPENAI_API_KEY')
 if api_key is None:
-    raise ValueError("OPENAI_API_KEY is not set in the environment variables")
+    raise ValueError("OPENAI_API_KEY is not set in the environment variables.")
 else:
     print("API Key found")
 
