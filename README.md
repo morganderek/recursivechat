@@ -1,6 +1,6 @@
 # README for ChatGPT Automation Python Application
 ## Overview
-This Python application leverages the PyQt6 framework to create a GUI application that automates the process of using ChatGPT models to process Excel and CSV files recursively. The application reads input data, sends it to a specified ChatGPT model, and saves the structured outputs to a user-defined file.
+This Python application automates the process of using ChatGPT models to process Excel and CSV files recursively. The application reads input data, sends it to a specified ChatGPT model, and saves the structured outputs to a user-defined file. User input is collected using PyQt6 to create a GUI application.
 
 ## Features
 GUI Setup: Fully interactive GUI for easy operation.
@@ -8,6 +8,7 @@ Model Configuration: Allows users to select between different GPT models.
 Dynamic Input/Output: Users can specify input and output files along with the columns to be processed and generated.
 Customizable Prompts: Configure the role and instructions for ChatGPT dynamically.
 Error Handling: Basic error handling and retry logic for API requests.
+
 ## Prerequisites
 1. Python 3.x
 2. PyQt6
