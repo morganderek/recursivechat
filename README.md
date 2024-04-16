@@ -15,6 +15,7 @@ Error Handling: Basic error handling and retry logic for API requests.
 3. pandas
 4. OpenAI's Python client library
 5. tenacity
+
 Ensure you have the latest versions of these libraries. You can install any missing libraries using pip:
 
 `pip install PyQt6 pandas openai tenacity`
