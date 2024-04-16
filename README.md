@@ -20,7 +20,7 @@ Ensure you have the latest versions of these libraries. You can install any miss
 
 `pip install PyQt6 pandas openai tenacity`
 
-The openai is version 1.17.1 (https://pypi.org/project/openai/)
+The openai version is the latest - 1.17.1 (https://pypi.org/project/openai/)
 ## Installation
 
 Clone the repository:
