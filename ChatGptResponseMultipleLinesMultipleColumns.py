@@ -169,7 +169,7 @@ class CustomDialog(QDialog):
         masterLayout.addLayout(buttonLayout)
 
     def browse_file(self):
-        default_dir = r"C:\Users\morga\OneDrive - CAG Consultants\04 Tech\Python Scripts\ChatGPT"  # Change this to the desired path
+        default_dir = r"C:\Temp"  # Change this to the desired path
         filePath, _ = QFileDialog.getOpenFileName(self, "Open File", default_dir, "CSV files (*.csv);;Excel files (*.xlsx)")
         if filePath:
             self.filePath = filePath
