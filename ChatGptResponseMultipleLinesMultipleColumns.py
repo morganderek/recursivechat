@@ -1,16 +1,13 @@
-from PyQt6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QFileDialog, QMessageBox, QSpacerItem, QSizePolicy,QFrame
-from PyQt6.QtCore import pyqtSignal, QThread, QSize
+from PyQt6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QFileDialog, QMessageBox, QFrame
 from PyQt6.QtGui import QFont
 from openai import OpenAI
 import pandas as pd
 import os
-import openai
 import csv
 import sys
 import re  # Import the regular expression module
 import logging
 import time
-import textwrap
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 with open('prompt.txt', 'r') as file:
