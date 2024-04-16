@@ -13,7 +13,13 @@ import time
 import textwrap
 from tenacity import retry, stop_after_attempt, wait_fixed
 
+with open('prompt.txt', 'r') as file:
+    # Read the content of the file
+    promptText = file.read()
 
+with open('promptEnding.txt', 'r') as file:
+    # Read the content of the file
+    promptEndingText = file.read()    
 
 class CustomDialog(QDialog):
     def __init__(self):
@@ -62,13 +68,13 @@ class CustomDialog(QDialog):
         promptLabel = QLabel("What do you want ChatGpt to do (Prompt)?")
         promptLabel.setFont(bold_font)
         generalInfoLayout.addWidget(promptLabel)
-        self.modelInstructionEntry = QTextEdit("I am writing a report for the Coventry city council in the UK on their future climate change risks. I am using the summary document CCRA-Evidence-Report-England-Summary to introduce each risk. I need you to draft a summary for a specific risk or opportunity. The summary should broadly explain what the risk or opportunity is. Please use this structure. Explain what the risk or opportunity is Explain why its important in the context of cities like Coventry in England Explain why its important to begin adapting to it. ")
+        self.modelInstructionEntry = QTextEdit(promptText)
         generalInfoLayout.addWidget(self.modelInstructionEntry)
 
         endingLabel = QLabel("How should the retured data be structured (Prompt Ending?)")
         endingLabel.setFont(bold_font)
         generalInfoLayout.addWidget(endingLabel)
-        self.promptEndingEntry = QTextEdit("Return the response in a table with 3 columns, 1) What, 2) Why Important and 3) Why adapt. Return only a table in the completion. I don't want any other comments. Don't say -here is your summary- or similar remarks. Please use plain language in the summary. This is the text I want you to summarise: ")
+        self.promptEndingEntry = QTextEdit(promptEndingText)
         generalInfoLayout.addWidget(self.promptEndingEntry)
 
         # Model selection
