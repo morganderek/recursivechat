@@ -30,7 +30,6 @@ class CustomDialog(QDialog):
         self.modelUsed = None
         self.modelInstruction = None
         self.promptEnding = None
-    #    self.openaiApikey = None
         self.filePath = None
         self.outputFilePath = None
         self.inputFilePromptColHeading = None
@@ -114,8 +113,7 @@ class CustomDialog(QDialog):
 
         self.filePathLabel = QLabel("No input file selected")
         inputLayout.addWidget(self.filePathLabel)
-        #self.setLayout(inputLayout)
-
+        
         inputColumnLabel = QLabel("What is the column heading with your input data:")
         inputColumnLabel.setFont(bold_font)
         inputLayout.addWidget(inputColumnLabel)
@@ -152,7 +150,7 @@ class CustomDialog(QDialog):
         outputColumnLabel.setFont(bold_font)
         outputLayout.addWidget(outputColumnLabel)
 
-        self.outputColumnNamesEntry = QLineEdit("1) What, 2) Why Important,3) Why adapt")
+        self.outputColumnNamesEntry = QLineEdit("1) Col1, 2) Col2, 3) Col3")
         outputLayout.addWidget(self.outputColumnNamesEntry)
         configLayout.addLayout(outputLayout)
 
@@ -202,7 +200,6 @@ class CustomDialog(QDialog):
         self.modelUsed = self.modelUsedCombo.currentText()
         self.modelInstruction = self.modelInstructionEntry.toPlainText()
         self.promptEnding = self.promptEndingEntry.toPlainText()
-    #    self.openaiApikey = self.openaiApiEntry.text()
         self.filePath = self.filePathLabel.text()  # Assuming filePathLabel displays the selected file path
         self.outputFilePath = self.outputFilePathLabel.text()  # Assuming outputFilePathLabel displays the selected output file path
         self.inputFilePromptColHeading = self.inputFilePromptColHeadingEntry.text()
@@ -218,11 +215,6 @@ else:
     client = OpenAI(api_key=api_key)
     print("API Key found and client instantiated")
 
-""" client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
-) """
-
 def main():
     app = QApplication(sys.argv)
     dialog = CustomDialog()
@@ -235,13 +227,13 @@ def main():
         inputFilePromptColHeading = dialog.inputFilePromptColHeading
         dynamicHeaders = dialog.dynamicHeaders
 
-        print(f"Model Role: {modelRole}")
+        """ print(f"Model Role: {modelRole}")
         print(f"Model Used: {modelUsed}")
         print(f"File Path: {filePath}")
         print(f"Output File Path: {outputFilePath}")
         print(f"Input Column Heading: {inputFilePromptColHeading}")
         print(f"Output Column Names: {dynamicHeaders}")
-        print(f"Instruction: {modelInstruction}")
+        print(f"Instruction: {modelInstruction}") """
 
     try:
         file_extension = filePath.split('.')[-1]
@@ -272,52 +264,81 @@ def main():
             temperature=0.1,
             timeout=10
         )
-        
-     #   usage_info = response.get('usage', {})
-     #   logging.info(f"ChatGPT usage: {usage_info}")
         return response.choices[0].message.content.strip()
 
+    # Write an empty DataFrame with the same columns as df to the output file to create headers
     df.iloc[0:0].to_csv(outputFilePath, index=False)
 
     def parse_table(table_text):
+        # Split the table_text into lines based on newline characters
         lines = table_text.strip().split('\n')
+        # Remove the first line if it only consists of '-', '|', '+', ' ', or newline characters
         if lines[0].strip('-|+ \n') == '':
             lines = lines[1:]
+        # Remove the last line if it only consists of '-', '|', '+', ' ', or newline characters
         if lines[-1].strip('-|+ \n') == '':
             lines = lines[:-1]
 
+        # Initialize an empty list to hold the parsed table data
         table_data = []
+        # Iterate over each line in the processed lines list
         for row in lines:
+            # Skip the row if it only consists of '-', '|', '+', ' ', or newline characters
             if row.strip('-|+ \n') == '':
                 continue
+            # Split the row into columns based on the '|' character, excluding the first and last split parts
             columns = re.split(r'\|', row)[1:-1]
+            # Strip whitespace from each column and add it to the list
             cleaned_columns = [col.strip() for col in columns]
+            # Append the cleaned columns list to table_data
             table_data.append(cleaned_columns)
+        # Return the parsed table data
         return table_data
 
+    # Combine the original DataFrame columns with the dynamicHeaders for the output CSV
     headers = list(df.columns) + dynamicHeaders
+    # Open the output file in write mode to write headers
     with open(outputFilePath, mode='w', newline='', encoding='utf-8') as file:
+        # Create a CSV writer object
         writer = csv.writer(file)
+        # Write the headers row
         writer.writerow(headers)
 
+    # Iterate over each row in the DataFrame
     for index, row in df.iterrows():
-        print(f"Now processing row {index+2}")
+        # Get the input text for the current row based on inputFilePromptColHeading
+        input_text = row[inputFilePromptColHeading]
+        #print(f"Now processing row {index+2}: {input_text}")  # Print current input text being processed
+        print(f"Now processing row {index+2}")  # Print current row rather than input text being processed
         try:
-            table_text = get_chatgpt_response(row[inputFilePromptColHeading])
+            # Call the get_chatgpt_response function with the input text to get the table text
+            table_text = get_chatgpt_response(input_text)
+            # Parse the table text into a list of lists (rows and columns)
             table_data = parse_table(table_text)
+            # Open the output file in append mode to write the processed rows
             with open(outputFilePath, mode='a', newline='', encoding='utf-8') as file:
+                # Create a CSV writer object
                 writer = csv.writer(file)
+                # Iterate over each row in the parsed table data
                 for table_row in table_data:
+                    # Combine the original row data with the parsed table row data
                     output_row = list(row) + table_row
+                    # Write the combined row to the output file
                     writer.writerow(output_row)
         except Exception as e:
+            # Print and log the error if any occurs during processing
             print(f"Error at index {index}: {e}")
             logging.error(f'Error at index {index}: {e}')
+            # Open the output file in append mode to write the error row
             with open(outputFilePath, mode='a', newline='', encoding='utf-8') as file:
+                # Create a CSV writer object
                 writer = csv.writer(file)
+                # Write an error row indicating the error and the index at which it occurred
                 error_row = list(row) + ['Error', f'Error at index {index}: {e}']
                 writer.writerow(error_row)
-                time.sleep(1) 
+                # Pause for 1 second after handling the error
+                time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
