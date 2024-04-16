@@ -16,44 +16,36 @@ OpenAI's Python client library
 tenacity
 Ensure you have the latest versions of these libraries. You can install any missing libraries using pip:
 
-bash
-Copy code
 pip install PyQt6 pandas openai tenacity
+
 Installation
+
 Clone the repository:
-
-bash
-Copy code
 git clone <repository_url>
+
 Navigate to the project directory:
-
-bash
-Copy code
 cd <project_directory>
-Install dependencies:
 
-bash
-Copy code
+Install dependencies:
 pip install -r requirements.txt
+
 Configuration
 Before running the application, you must set the OPENAI_API_KEY environment variable:
 
-bash
-Copy code
 export OPENAI_API_KEY='your-api-key-here'
 This API key is required to authenticate requests sent to OpenAI's API.
 
 Usage
 To start the application, run the following command in the terminal:
 
-bash
-Copy code
 python <script_name.py>
+
 How to Use the GUI
 Set Role and Instructions: Define what role ChatGPT should play and provide specific instructions for the task.
 Select Model: Choose the GPT model you wish to use from the dropdown.
 Configure Files and Columns: Use the "Browse" buttons to select input and output files and define the relevant column headings.
 Run the Process: Click "Run" to start processing. The GUI will display progress and any errors encountered.
+
 Output
 The output will be saved in the format specified by the user in the chosen output file. The output includes dynamically specified columns along with the original data from the input file.
 
@@ -61,6 +53,7 @@ Error Handling
 The application will alert the user if mandatory fields are not filled.
 Retries are implemented for handling API request failures.
 Detailed error messages and logs will help in troubleshooting.
+
 Logging
 Logs are generated to provide detailed operational traces, particularly useful for debugging and verifying the system processes.
 
