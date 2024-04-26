@@ -14,10 +14,6 @@ with open('prompt.txt', 'r') as file:
     # Read the content of the file
     promptText = file.read()
 
-with open('promptEnding.txt', 'r') as file:
-    # Read the content of the file
-    promptEndingText = file.read()    
-
 class CustomDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -26,7 +22,6 @@ class CustomDialog(QDialog):
         self.modelRole = None
         self.modelUsed = None
         self.modelInstruction = None
-        self.promptEnding = None
         self.filePath = None
         self.outputFilePath = None
         self.inputFilePromptColHeading = None
@@ -66,12 +61,6 @@ class CustomDialog(QDialog):
         generalInfoLayout.addWidget(promptLabel)
         self.modelInstructionEntry = QTextEdit(promptText)
         generalInfoLayout.addWidget(self.modelInstructionEntry)
-
-        endingLabel = QLabel("How should the retured data be structured (Prompt Ending?)")
-        endingLabel.setFont(bold_font)
-        generalInfoLayout.addWidget(endingLabel)
-        self.promptEndingEntry = QTextEdit(promptEndingText)
-        generalInfoLayout.addWidget(self.promptEndingEntry)
 
         # Model selection
         modelSelectionLayout = QVBoxLayout()
@@ -160,8 +149,11 @@ class CustomDialog(QDialog):
         # Bottom buttons
         buttonLayout = QHBoxLayout()
         self.okButton = QPushButton("Run")
+        self.okButton.setDefault(True)  # Make this the default button
+        self.okButton.setStyleSheet("background-color: #4682B4; color: white; font-weight: bold;")  # Steel blue color
         self.okButton.clicked.connect(self.on_ok)
         buttonLayout.addWidget(self.okButton)
+
 
         self.cancelButton = QPushButton("Cancel")
         self.cancelButton.clicked.connect(self.close)
@@ -196,13 +188,20 @@ class CustomDialog(QDialog):
         self.modelRole = self.modelRoleEntry.text()
         self.modelUsed = self.modelUsedCombo.currentText()
         self.modelInstruction = self.modelInstructionEntry.toPlainText()
-        self.promptEnding = self.promptEndingEntry.toPlainText()
         self.filePath = self.filePathLabel.text()  # Assuming filePathLabel displays the selected file path
         self.outputFilePath = self.outputFilePathLabel.text()  # Assuming outputFilePathLabel displays the selected output file path
         self.inputFilePromptColHeading = self.inputFilePromptColHeadingEntry.text()
         self.outputColumnNames = self.outputColumnNamesEntry.text()
         self.dynamicHeaders = [x.strip() for x in self.outputColumnNames.split(',') if x.strip()]
-        self.accept()  # Use QDialog's accept method to close the dialog properly
+                # Call format_prompt to generate and print the promptEnding
+        self.format_prompt()
+        super(CustomDialog, self).accept()
+
+    def format_prompt(self):
+            headers_string = ', '.join(self.dynamicHeaders)
+            self.promptEnding = f" Return the response in a table with the columns {headers_string}. Return only a table in the completion. I don't want any other comments. Don't say 'here is your summary' or similar remarks. Please use plain language in the summary. This is the text: "
+            #print(self.promptEnding)
+
 
 # Create an OpenAI client instance
 api_key = os.getenv('OPENAI_API_KEY')
@@ -223,14 +222,7 @@ def main():
         outputFilePath = dialog.outputFilePath
         inputFilePromptColHeading = dialog.inputFilePromptColHeading
         dynamicHeaders = dialog.dynamicHeaders
-
-        """ print(f"Model Role: {modelRole}")
-        print(f"Model Used: {modelUsed}")
-        print(f"File Path: {filePath}")
-        print(f"Output File Path: {outputFilePath}")
-        print(f"Input Column Heading: {inputFilePromptColHeading}")
-        print(f"Output Column Names: {dynamicHeaders}")
-        print(f"Instruction: {modelInstruction}") """
+        print(f"Instruction: {modelInstruction}")
 
     try:
         file_extension = filePath.split('.')[-1]
