@@ -158,7 +158,6 @@ class CustomDialog(QDialog):
         self.cancelButton = QPushButton("Cancel")
         self.cancelButton.clicked.connect(self.close)
         buttonLayout.addWidget(self.cancelButton)
-
         masterLayout.addLayout(buttonLayout)
 
     def browse_file(self):
