@@ -241,7 +241,7 @@ def main():
         else:
             raise ValueError(f'Unsupported file extension: {file_extension}')
     except ValueError as e:
-        messagebox.showerror("File Type Error", str(e))
+        QMessageBox.critical(None, "File Type Error", str(e))
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
