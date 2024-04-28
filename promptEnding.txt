@@ -1,1 +1,0 @@
-"Return the response in a table with 3 columns, 1) Risk Title, 2) Exposure and 3) Sensitivity. Return only a table in the completion. I don't want any other comments. Don't say -here is your summary- or similar remarks. Please use plain language in the summary. This is the risk I want you to summarise: "
