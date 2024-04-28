@@ -6,7 +6,7 @@ import csv
 import re  # Import the regular expression module
 import logging
 import time
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed, after
 from openai import OpenAI
 from ui import CustomDialog  # Import the CustomDialog class from ui.py
 
@@ -19,9 +19,9 @@ else:
     print("API Key found and client instantiated")
 
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication(sys.argv) #launch GUI
     dialog = CustomDialog()
-    if dialog.exec() == QDialog.DialogCode.Accepted:
+    if dialog.exec() == QDialog.DialogCode.Accepted: #get data from GUI
         filePath = dialog.filePath
         modelRole = dialog.modelRole
         modelUsed = dialog.modelUsed
@@ -48,8 +48,8 @@ def main():
     def log_retry(attempt):
         logger.info(f"Retrying... Attempt {attempt.retry_state.attempt_number}")
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
-    def get_chatgpt_response(text):
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), after=after(log_retry))
+    def get_chatgpt_response(text): #main chatGPT function
         response = client.chat.completions.create(
             model=modelUsed,
             messages=[
