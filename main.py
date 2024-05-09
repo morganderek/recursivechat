@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QMessageBox,QDialog
+from PyQt6.QtWidgets import QApplication, QMessageBox, QDialog
 import sys
 import os
 import pandas as pd
@@ -6,7 +6,7 @@ import csv
 import re  # Import the regular expression module
 import logging
 import time
-from tenacity import retry, stop_after_attempt, wait_fixed, after
+from tenacity import retry, stop_after_attempt, wait_fixed, after_log
 from openai import OpenAI
 from ui import CustomDialog  # Import the CustomDialog class from ui.py
 
@@ -45,10 +45,10 @@ def main():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    def log_retry(attempt):
-        logger.info(f"Retrying... Attempt {attempt.retry_state.attempt_number}")
+    def log_retry(retry_state):
+        logger.info(f"Retrying... Attempt {retry_state.attempt_number}")
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), after=after(log_retry))
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1), after=after_log(logger, log_level=logging.INFO))
     def get_chatgpt_response(text): #main chatGPT function
         response = client.chat.completions.create(
             model=modelUsed,

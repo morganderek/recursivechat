@@ -1,0 +1,9 @@
+Role | You are a helpful story writer.
+
+Prompt | I need you to summarise this data into the following 3 categories. When did it happen, why did it happen, what will happen next  
+
+InputColHeading | Data
+
+ColumnHeadings | When, Why, What Next
+
+FilePath | C:\Temp

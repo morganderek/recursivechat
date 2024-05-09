@@ -4,9 +4,28 @@ from PyQt6.QtWidgets import (QApplication, QDialog, QLabel, QPushButton, QVBoxLa
 from PyQt6.QtGui import QFont
 import os
 
-with open('prompt.txt', 'r') as file:
-    # Read the content of the file
-    promptText = file.read()
+def read_defaultUIValues_file(filename):
+    defaults = {"Role": "You are a helpful expert climate change expert.",  # Default values
+                "Prompt": "Insert your detailed prompt here.",
+                "InputColHeading": "Data",
+                "ColumnHeadings": "1,2,3",
+                "FilePath": "C:\Temp"}
+    if not os.path.exists(filename):
+        return defaults["Role"], defaults["Prompt"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
+    
+    with open(filename, 'r') as file:
+        for line in file:
+            if '|' in line:
+                key, value = line.split('|', 1)  # Split on the first colon
+                key = key.strip()
+                value = value.strip()
+                if key in defaults:
+                    defaults[key] = value
+    
+    return defaults["Role"], defaults["Prompt"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
+
+# Read from prompt.txt
+default_role, default_instruction, default_InputColHeading, default_ColumnHeadings, default_Filepath = read_defaultUIValues_file('defaultUIValues.txt')
 
 class CustomDialog(QDialog):
     def __init__(self):
@@ -43,17 +62,16 @@ class CustomDialog(QDialog):
         formHeader.setFont(subheading_font)
         generalInfoLayout.addWidget(formHeader)
 
-
         roleLabel = QLabel("What role should ChatGpt play (Role)?")
         roleLabel.setFont(bold_font)
         generalInfoLayout.addWidget(roleLabel)
-        self.modelRoleEntry = QLineEdit("You are a helpful expert climate change expert.")
+        self.modelRoleEntry = QLineEdit(default_role)
         generalInfoLayout.addWidget(self.modelRoleEntry)
 
         promptLabel = QLabel("What do you want ChatGpt to do (Prompt)?")
         promptLabel.setFont(bold_font)
         generalInfoLayout.addWidget(promptLabel)
-        self.modelInstructionEntry = QTextEdit(promptText)
+        self.modelInstructionEntry = QTextEdit(default_instruction)
         generalInfoLayout.addWidget(self.modelInstructionEntry)
 
         # Model selection
@@ -98,7 +116,7 @@ class CustomDialog(QDialog):
         inputColumnLabel.setFont(bold_font)
         inputLayout.addWidget(inputColumnLabel)
 
-        self.inputFilePromptColHeadingEntry = QLineEdit("Data")
+        self.inputFilePromptColHeadingEntry = QLineEdit(default_InputColHeading)
         inputLayout.addWidget(self.inputFilePromptColHeadingEntry)
         configLayout.addLayout(inputLayout)
 
@@ -130,7 +148,7 @@ class CustomDialog(QDialog):
         outputColumnLabel.setFont(bold_font)
         outputLayout.addWidget(outputColumnLabel)
 
-        self.outputColumnNamesEntry = QLineEdit("1) Col1, 2) Col2, 3) Col3")
+        self.outputColumnNamesEntry = QLineEdit(default_ColumnHeadings)
         outputLayout.addWidget(self.outputColumnNamesEntry)
         configLayout.addLayout(outputLayout)
 
@@ -155,7 +173,7 @@ class CustomDialog(QDialog):
         masterLayout.addLayout(buttonLayout)
 
     def browse_file(self):
-        default_dir = r"C:\Temp"  # Change this to the desired path
+        default_dir = (default_Filepath)
         filePath, _ = QFileDialog.getOpenFileName(self, "Open File", default_dir, "CSV files (*.csv);;Excel files (*.xlsx)")
         if filePath:
             self.filePath = filePath
