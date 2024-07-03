@@ -7,11 +7,12 @@ import os
 def read_defaultUIValues_file(filename):
     defaults = {"Role": "You are a helpful expert climate change expert.",  # Default values
                 "Prompt": "Insert your detailed prompt here.",
+                "PromptStyle": "This is the text: ",
                 "InputColHeading": "Data",
                 "ColumnHeadings": "1,2,3",
                 "FilePath": "C:\Temp"}
     if not os.path.exists(filename):
-        return defaults["Role"], defaults["Prompt"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
+        return defaults["Role"], defaults["Prompt"],defaults["PromptStyle"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
     
     with open(filename, 'r') as file:
         for line in file:
@@ -22,10 +23,10 @@ def read_defaultUIValues_file(filename):
                 if key in defaults:
                     defaults[key] = value
     
-    return defaults["Role"], defaults["Prompt"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
+    return defaults["Role"], defaults["Prompt"], defaults["PromptStyle"], defaults["InputColHeading"], defaults["ColumnHeadings"], defaults["FilePath"]
 
-# Read from prompt.txt
-default_role, default_instruction, default_InputColHeading, default_ColumnHeadings, default_Filepath = read_defaultUIValues_file('defaultUIValues.txt')
+# Read from defaultUIValues.txt
+default_role, default_instruction, default_PromptStyle, default_InputColHeading, default_ColumnHeadings, default_Filepath = read_defaultUIValues_file('defaultUIValues.txt')
 
 class CustomDialog(QDialog):
     def __init__(self):
@@ -35,6 +36,7 @@ class CustomDialog(QDialog):
         self.modelRole = None
         self.modelUsed = None
         self.modelInstruction = None
+        self.modelInstructionStyle = None
         self.filePath = None
         self.outputFilePath = None
         self.inputFilePromptColHeading = None
@@ -73,6 +75,13 @@ class CustomDialog(QDialog):
         generalInfoLayout.addWidget(promptLabel)
         self.modelInstructionEntry = QTextEdit(default_instruction)
         generalInfoLayout.addWidget(self.modelInstructionEntry)
+
+        # Prompt Ending
+        promptStyleLabel = QLabel("How do you want ChatGpt to communicate?")
+        promptStyleLabel.setFont(bold_font)
+        generalInfoLayout.addWidget(promptStyleLabel)
+        self.modelInstructionStyleEntry = QTextEdit(default_PromptStyle)
+        generalInfoLayout.addWidget(self.modelInstructionStyleEntry)
 
         # Model selection
         modelSelectionLayout = QVBoxLayout()
@@ -199,6 +208,7 @@ class CustomDialog(QDialog):
         self.modelRole = self.modelRoleEntry.text()
         self.modelUsed = self.modelUsedCombo.currentText()
         self.modelInstruction = self.modelInstructionEntry.toPlainText()
+        self.modelInstructionStyle = self.modelInstructionStyleEntry.toPlainText()
         self.filePath = self.filePathLabel.text()  # Assuming filePathLabel displays the selected file path
         self.outputFilePath = self.outputFilePathLabel.text()  # Assuming outputFilePathLabel displays the selected output file path
         self.inputFilePromptColHeading = self.inputFilePromptColHeadingEntry.text()
@@ -210,5 +220,5 @@ class CustomDialog(QDialog):
 
     def format_prompt(self):
             headers_string = ', '.join(self.dynamicHeaders)
-            self.promptEnding = f" Return the response in a table with the columns {headers_string}. Return only a table in the completion. I don't want any other comments. Don't say 'here is your summary' or similar remarks. Please use plain language in the summary. This is the text: "
+            self.promptEnding = f" Return only a table in the completion. Return the response in a table with the columns {headers_string}.  I don't want any other comments. Don't say 'here is your summary' or similar remarks."
             #print(self.promptEnding)

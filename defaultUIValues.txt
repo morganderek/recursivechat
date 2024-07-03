@@ -2,6 +2,8 @@ Role | You are a helpful story writer.
 
 Prompt | I need you to summarise this data into the following 3 categories. When did it happen, why did it happen, what will happen next  
 
+PromptStyle | Please use plain language in the summary. This is the text:   
+
 InputColHeading | Data
 
 ColumnHeadings | When, Why, What Next
