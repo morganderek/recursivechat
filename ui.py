@@ -77,7 +77,7 @@ class CustomDialog(QDialog):
         generalInfoLayout.addWidget(self.modelInstructionEntry)
 
         # Prompt Ending
-        promptStyleLabel = QLabel("How do you want ChatGpt to communicate?")
+        promptStyleLabel = QLabel("What style do want ChatGpt to communicate in?")
         promptStyleLabel.setFont(bold_font)
         generalInfoLayout.addWidget(promptStyleLabel)
         self.modelInstructionStyleEntry = QTextEdit(default_PromptStyle)

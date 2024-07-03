@@ -1,6 +1,6 @@
 # README for ChatGPT Automation Python Application
 ## Overview
-This Python application automates the process of using ChatGPT models to process Excel and CSV files recursively. The application reads input data, appends it to a prompt and sends it to a specified ChatGPT model, and saves the structured outputs to a user-defined file. User input is collected using PyQt6 to create a GUI application.
+This Python application automates the process of prompting ChatGPT models. The application reads input data in the Excel file, appends it to a prompt and sends it to a specified ChatGPT model, and saves the structured outputs to the output file. It does this for all rows of data in the Excel file. User input is collected using PyQt6 to create a GUI application.
 
 ## Features
 GUI Setup: Fully interactive GUI for easy operation.
@@ -12,7 +12,7 @@ Error Handling: Basic error handling and retry logic for API requests.
 ## Prerequisites
 `pip install PyQt6 pandas openai tenacity`
 
-The openai version is the latest - 1.17.1 (https://pypi.org/project/openai/)
+The openai version is - 1.17.1 (https://pypi.org/project/openai/)
 
 ## Installation
 Clone the repository:
@@ -25,7 +25,7 @@ Install dependencies:
 `pip install -r requirements.txt`
 
 ## Configuration
-This API key is required to authenticate requests sent to OpenAI's API.
+An API key is required to authenticate requests sent to OpenAI's API.
 
 Before running the application, you must set the OPENAI_API_KEY environment variable. See (https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
 
@@ -37,11 +37,13 @@ To start the application, run the following command in the terminal:
 `python main.py`
 
 ## How to Use the GUI
-When GUI open, you can change values
+When GUI open, you can change the default values
 
 Role: What is the role of the LLM. Something similar to your are an expert in XXX
 
 Prompt: Provide specific instructions for the task.
+
+Prompt Style: What tone of language do you want the results to be?
 
 Select Model: Choose the GPT model you wish to use from the dropdown.
 
@@ -67,13 +69,9 @@ Logs are generated to provide detailed operational traces, particularly useful f
 ## Limitations
 The application currently supports only CSV and Excel file formats.
 Error handling for file operations and API interactions is basic and might need enhancement for production use.
-Contributing
-Contributions to the project are welcome. You can contribute by:
 
-## Reporting bugs
-Suggesting enhancements
-Creating pull requests to propose improvements
-Ensure you follow the existing code structure and quality standards.
+## Contributing
+Contributions to the project are welcome.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
