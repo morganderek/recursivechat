@@ -82,7 +82,7 @@ class CustomDialog(QDialog):
         modelLabel.setFont(bold_font)
         modelSelectionLayout.addWidget(modelLabel)
         self.modelUsedCombo = QComboBox()
-        self.modelUsedCombo.addItems(['gpt-4','gpt-4-turbo','gpt-3.5-turbo', ])
+        self.modelUsedCombo.addItems(['gpt-4o','gpt-4','gpt-4-turbo','gpt-3.5-turbo', ])
         modelSelectionLayout.addWidget(self.modelUsedCombo)
 
         # Insert horizontal line separator before input configuration
