@@ -25,7 +25,7 @@ def main():
         filePath = dialog.filePath
         modelRole = dialog.modelRole
         modelUsed = dialog.modelUsed
-        modelInstruction = dialog.modelInstruction + dialog.promptEnding + dialog.modelInstructionStyle
+        modelInstruction = dialog.modelInstruction + dialog.promptEnding + dialog.modelInstructionStyle + " This is the data: "
         outputFilePath = dialog.outputFilePath
         inputFilePromptColHeading = dialog.inputFilePromptColHeading
         dynamicHeaders = dialog.dynamicHeaders

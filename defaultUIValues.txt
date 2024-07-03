@@ -1,8 +1,8 @@
 Role | You are a helpful story writer.
 
-Prompt | I need you to summarise this data into the following 3 categories. When did it happen, why did it happen, what will happen next  
+Prompt | I need you to summarise this data into the following 3 categories. When did it happen, why did it happen, what will happen next.  
 
-PromptStyle | Please use plain language in the summary. This is the text:   
+PromptStyle | Use UK English spelling. Write short sentences of no longer than 20-25 words. Include only one main idea per paragraph. Avoid jargon, acronyms, and impersonal corporate language. Use simple words rather than their longer equivalents. 
 
 InputColHeading | Data
 

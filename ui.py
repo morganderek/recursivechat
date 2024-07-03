@@ -5,9 +5,9 @@ from PyQt6.QtGui import QFont
 import os
 
 def read_defaultUIValues_file(filename):
-    defaults = {"Role": "You are a helpful expert climate change expert.",  # Default values
-                "Prompt": "Insert your detailed prompt here.",
-                "PromptStyle": "This is the text: ",
+    defaults = {"Role": "You are a helpful expert.",  # Default values
+                "Prompt": " Insert your detailed prompt here.",
+                "PromptStyle": " Use plain language.",
                 "InputColHeading": "Data",
                 "ColumnHeadings": "1,2,3",
                 "FilePath": "C:\Temp"}
@@ -77,7 +77,7 @@ class CustomDialog(QDialog):
         generalInfoLayout.addWidget(self.modelInstructionEntry)
 
         # Prompt Ending
-        promptStyleLabel = QLabel("What style do want ChatGpt to communicate in?")
+        promptStyleLabel = QLabel("What style do want ChatGpt to communicate in (Style)?")
         promptStyleLabel.setFont(bold_font)
         generalInfoLayout.addWidget(promptStyleLabel)
         self.modelInstructionStyleEntry = QTextEdit(default_PromptStyle)
@@ -91,7 +91,7 @@ class CustomDialog(QDialog):
         modelLabel.setFont(bold_font)
         modelSelectionLayout.addWidget(modelLabel)
         self.modelUsedCombo = QComboBox()
-        self.modelUsedCombo.addItems(['gpt-4o','gpt-4','gpt-4-turbo','gpt-3.5-turbo', ])
+        self.modelUsedCombo.addItems(['gpt-4o','gpt-4','gpt-4-turbo','gpt-3.5-turbo' ])
         modelSelectionLayout.addWidget(self.modelUsedCombo)
 
         # Insert horizontal line separator before input configuration

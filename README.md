@@ -44,7 +44,7 @@ Role: What is the role of the LLM. Something similar to your are an expert in XX
 
 Prompt: Provide specific instructions for the task.
 
-Prompt Style: What tone of language do you want the results to be?
+Style: What tone of language do you want the results to be?
 
 Select Model: Choose the GPT model you wish to use from the dropdown.
 
