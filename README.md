@@ -1,6 +1,7 @@
 # README for ChatGPT Automation Python Application
 ## Overview
-This Python application automates the process of prompting ChatGPT models. The application reads input data in the Excel file, appends it to a prompt and sends it to a specified ChatGPT model, and saves the structured outputs to the output file. It does this for all rows of data in the Excel file. User input is collected using PyQt6 to create a GUI application.
+This Python application automates the process of prompting ChatGPT models. The application reads input data in the Excel file, appends it to a prompt and sends it to a specified ChatGPT model, and saves the structured outputs to the output file. It repeats thsi process this for each rows of data in the Excel file. 
+User input is collected using PyQt6 to create a GUI application.
 
 ## Features
 GUI Setup: Fully interactive GUI for easy operation.
